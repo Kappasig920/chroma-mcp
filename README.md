@@ -16,12 +16,9 @@ The full API of this library can be found in [api.md](api.md).
 ## Installation
 
 ```sh
-# install from the production repo
-pip install git+ssh://git@github.com/Kappasig920/chroma-mcp.git
+# install from PyPI
+pip install claude
 ```
-
-> [!NOTE]
-> Once this package is [published to PyPI](https://www.stainless.com/docs/guides/publish), this will become: `pip install claude`
 
 ## Usage
 
@@ -83,8 +80,8 @@ By default, the async client uses `httpx` for HTTP requests. However, for improv
 You can enable this by installing `aiohttp`:
 
 ```sh
-# install from the production repo
-pip install 'claude[aiohttp] @ git+ssh://git@github.com/Kappasig920/chroma-mcp.git'
+# install from PyPI
+pip install claude[aiohttp]
 ```
 
 Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
