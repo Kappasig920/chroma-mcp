@@ -87,6 +87,7 @@ pip install claude[aiohttp]
 Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
 
 ```python
+import os
 import asyncio
 from claude import DefaultAioHttpClient
 from claude import AsyncClaude
@@ -94,7 +95,7 @@ from claude import AsyncClaude
 
 async def main() -> None:
     async with AsyncClaude(
-        api_key="My API Key",
+        api_key=os.environ.get("PETSTORE_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
         order = await client.store.orders.create(
