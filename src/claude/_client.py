@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Mapping
+from typing import TYPE_CHECKING, Any, Mapping
 from typing_extensions import Self, override
 
 import httpx
@@ -20,8 +20,8 @@ from ._types import (
     not_given,
 )
 from ._utils import is_given, get_async_library
+from ._compat import cached_property
 from ._version import __version__
-from .resources import pets, users
 from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._exceptions import ClaudeError, APIStatusError
 from ._base_client import (
@@ -29,18 +29,17 @@ from ._base_client import (
     SyncAPIClient,
     AsyncAPIClient,
 )
-from .resources.store import store
+
+if TYPE_CHECKING:
+    from .resources import pets, store, users
+    from .resources.pets import PetsResource, AsyncPetsResource
+    from .resources.users import UsersResource, AsyncUsersResource
+    from .resources.store.store import StoreResource, AsyncStoreResource
 
 __all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Claude", "AsyncClaude", "Client", "AsyncClient"]
 
 
 class Claude(SyncAPIClient):
-    pets: pets.PetsResource
-    store: store.StoreResource
-    users: users.UsersResource
-    with_raw_response: ClaudeWithRawResponse
-    with_streaming_response: ClaudeWithStreamedResponse
-
     # client options
     api_key: str
 
@@ -95,11 +94,31 @@ class Claude(SyncAPIClient):
             _strict_response_validation=_strict_response_validation,
         )
 
-        self.pets = pets.PetsResource(self)
-        self.store = store.StoreResource(self)
-        self.users = users.UsersResource(self)
-        self.with_raw_response = ClaudeWithRawResponse(self)
-        self.with_streaming_response = ClaudeWithStreamedResponse(self)
+    @cached_property
+    def pets(self) -> PetsResource:
+        from .resources.pets import PetsResource
+
+        return PetsResource(self)
+
+    @cached_property
+    def store(self) -> StoreResource:
+        from .resources.store import StoreResource
+
+        return StoreResource(self)
+
+    @cached_property
+    def users(self) -> UsersResource:
+        from .resources.users import UsersResource
+
+        return UsersResource(self)
+
+    @cached_property
+    def with_raw_response(self) -> ClaudeWithRawResponse:
+        return ClaudeWithRawResponse(self)
+
+    @cached_property
+    def with_streaming_response(self) -> ClaudeWithStreamedResponse:
+        return ClaudeWithStreamedResponse(self)
 
     @property
     @override
@@ -207,12 +226,6 @@ class Claude(SyncAPIClient):
 
 
 class AsyncClaude(AsyncAPIClient):
-    pets: pets.AsyncPetsResource
-    store: store.AsyncStoreResource
-    users: users.AsyncUsersResource
-    with_raw_response: AsyncClaudeWithRawResponse
-    with_streaming_response: AsyncClaudeWithStreamedResponse
-
     # client options
     api_key: str
 
@@ -267,11 +280,31 @@ class AsyncClaude(AsyncAPIClient):
             _strict_response_validation=_strict_response_validation,
         )
 
-        self.pets = pets.AsyncPetsResource(self)
-        self.store = store.AsyncStoreResource(self)
-        self.users = users.AsyncUsersResource(self)
-        self.with_raw_response = AsyncClaudeWithRawResponse(self)
-        self.with_streaming_response = AsyncClaudeWithStreamedResponse(self)
+    @cached_property
+    def pets(self) -> AsyncPetsResource:
+        from .resources.pets import AsyncPetsResource
+
+        return AsyncPetsResource(self)
+
+    @cached_property
+    def store(self) -> AsyncStoreResource:
+        from .resources.store import AsyncStoreResource
+
+        return AsyncStoreResource(self)
+
+    @cached_property
+    def users(self) -> AsyncUsersResource:
+        from .resources.users import AsyncUsersResource
+
+        return AsyncUsersResource(self)
+
+    @cached_property
+    def with_raw_response(self) -> AsyncClaudeWithRawResponse:
+        return AsyncClaudeWithRawResponse(self)
+
+    @cached_property
+    def with_streaming_response(self) -> AsyncClaudeWithStreamedResponse:
+        return AsyncClaudeWithStreamedResponse(self)
 
     @property
     @override
@@ -379,31 +412,103 @@ class AsyncClaude(AsyncAPIClient):
 
 
 class ClaudeWithRawResponse:
+    _client: Claude
+
     def __init__(self, client: Claude) -> None:
-        self.pets = pets.PetsResourceWithRawResponse(client.pets)
-        self.store = store.StoreResourceWithRawResponse(client.store)
-        self.users = users.UsersResourceWithRawResponse(client.users)
+        self._client = client
+
+    @cached_property
+    def pets(self) -> pets.PetsResourceWithRawResponse:
+        from .resources.pets import PetsResourceWithRawResponse
+
+        return PetsResourceWithRawResponse(self._client.pets)
+
+    @cached_property
+    def store(self) -> store.StoreResourceWithRawResponse:
+        from .resources.store import StoreResourceWithRawResponse
+
+        return StoreResourceWithRawResponse(self._client.store)
+
+    @cached_property
+    def users(self) -> users.UsersResourceWithRawResponse:
+        from .resources.users import UsersResourceWithRawResponse
+
+        return UsersResourceWithRawResponse(self._client.users)
 
 
 class AsyncClaudeWithRawResponse:
+    _client: AsyncClaude
+
     def __init__(self, client: AsyncClaude) -> None:
-        self.pets = pets.AsyncPetsResourceWithRawResponse(client.pets)
-        self.store = store.AsyncStoreResourceWithRawResponse(client.store)
-        self.users = users.AsyncUsersResourceWithRawResponse(client.users)
+        self._client = client
+
+    @cached_property
+    def pets(self) -> pets.AsyncPetsResourceWithRawResponse:
+        from .resources.pets import AsyncPetsResourceWithRawResponse
+
+        return AsyncPetsResourceWithRawResponse(self._client.pets)
+
+    @cached_property
+    def store(self) -> store.AsyncStoreResourceWithRawResponse:
+        from .resources.store import AsyncStoreResourceWithRawResponse
+
+        return AsyncStoreResourceWithRawResponse(self._client.store)
+
+    @cached_property
+    def users(self) -> users.AsyncUsersResourceWithRawResponse:
+        from .resources.users import AsyncUsersResourceWithRawResponse
+
+        return AsyncUsersResourceWithRawResponse(self._client.users)
 
 
 class ClaudeWithStreamedResponse:
+    _client: Claude
+
     def __init__(self, client: Claude) -> None:
-        self.pets = pets.PetsResourceWithStreamingResponse(client.pets)
-        self.store = store.StoreResourceWithStreamingResponse(client.store)
-        self.users = users.UsersResourceWithStreamingResponse(client.users)
+        self._client = client
+
+    @cached_property
+    def pets(self) -> pets.PetsResourceWithStreamingResponse:
+        from .resources.pets import PetsResourceWithStreamingResponse
+
+        return PetsResourceWithStreamingResponse(self._client.pets)
+
+    @cached_property
+    def store(self) -> store.StoreResourceWithStreamingResponse:
+        from .resources.store import StoreResourceWithStreamingResponse
+
+        return StoreResourceWithStreamingResponse(self._client.store)
+
+    @cached_property
+    def users(self) -> users.UsersResourceWithStreamingResponse:
+        from .resources.users import UsersResourceWithStreamingResponse
+
+        return UsersResourceWithStreamingResponse(self._client.users)
 
 
 class AsyncClaudeWithStreamedResponse:
+    _client: AsyncClaude
+
     def __init__(self, client: AsyncClaude) -> None:
-        self.pets = pets.AsyncPetsResourceWithStreamingResponse(client.pets)
-        self.store = store.AsyncStoreResourceWithStreamingResponse(client.store)
-        self.users = users.AsyncUsersResourceWithStreamingResponse(client.users)
+        self._client = client
+
+    @cached_property
+    def pets(self) -> pets.AsyncPetsResourceWithStreamingResponse:
+        from .resources.pets import AsyncPetsResourceWithStreamingResponse
+
+        return AsyncPetsResourceWithStreamingResponse(self._client.pets)
+
+    @cached_property
+    def store(self) -> store.AsyncStoreResourceWithStreamingResponse:
+        from .resources.store import AsyncStoreResourceWithStreamingResponse
+
+        return AsyncStoreResourceWithStreamingResponse(self._client.store)
+
+    @cached_property
+    def users(self) -> users.AsyncUsersResourceWithStreamingResponse:
+        from .resources.users import AsyncUsersResourceWithStreamingResponse
+
+        return AsyncUsersResourceWithStreamingResponse(self._client.users)
 
 
 Client = Claude
