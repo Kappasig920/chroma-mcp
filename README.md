@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 [![PyPI version](https://img.shields.io/pypi/v/claude.svg?label=pypi%20(stable))](https://pypi.org/project/claude/)
 
-The Claude Python library provides convenient access to the Claude REST API from any Python 3.8+
+The Claude Python library provides convenient access to the Claude REST API from any Python 3.9+
 application. The library includes type definitions for all request params and response fields,
 and offers both synchronous and asynchronous clients powered by [httpx](https://github.com/encode/httpx).
 
@@ -87,6 +87,7 @@ pip install claude[aiohttp]
 Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
 
 ```python
+import os
 import asyncio
 from claude import DefaultAioHttpClient
 from claude import AsyncClaude
@@ -94,7 +95,7 @@ from claude import AsyncClaude
 
 async def main() -> None:
     async with AsyncClaude(
-        api_key="My API Key",
+        api_key=os.environ.get("PETSTORE_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
         order = await client.store.orders.create(
@@ -385,7 +386,7 @@ print(claude.__version__)
 
 ## Requirements
 
-Python 3.8 or higher.
+Python 3.9 or higher.
 
 ## Contributing
 
